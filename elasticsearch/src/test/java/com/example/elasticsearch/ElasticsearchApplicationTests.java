@@ -63,6 +63,7 @@ public class ElasticsearchApplicationTests {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Gson gson = new Gson();
 
         String str = sb.toString();
         String[] split = str.split("\\d+");
@@ -86,7 +87,8 @@ public class ElasticsearchApplicationTests {
 
             poems.setContent(stringBuilder.toString());
             if (!StringUtils.isEmpty(poems.getAuthor())) {
-                poemsRepository.save(poems);
+//                poemsRepository.save(poems);
+                System.out.println(gson.toJson(poems));
             }
         }
 
