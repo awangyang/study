@@ -87,7 +87,7 @@ public class ElasticsearchApplicationTests {
 
             poems.setContent(stringBuilder.toString());
             if (!StringUtils.isEmpty(poems.getAuthor())) {
-//                poemsRepository.save(poems);
+                poemsRepository.save(poems);
                 System.out.println(gson.toJson(poems));
             }
         }
