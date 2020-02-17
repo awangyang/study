@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <modules>
         <module>design-pattern</module>
-        <module>spring</module>
+        <module>spring-demo</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
