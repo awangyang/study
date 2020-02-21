@@ -8,6 +8,7 @@
         <module>flink</module>
         <module>guava</module>
         <module>kafka</module>
+        <module>netty</module>
         <module>nio</module>
         <module>redis</module>
         <module>spring</module>
