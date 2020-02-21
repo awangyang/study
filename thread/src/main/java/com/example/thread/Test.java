@@ -15,8 +15,8 @@ public class Test {
                 .setNameFormat("demo-pool-%d").build();
         ThreadPoolExecutor pool = new ThreadPoolExecutor(5,
                 10, 200,
-                TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(90),namedThreadFactory,new ThreadPoolExecutor.AbortPolicy());
-        for (int i = 0; i < 100; i++) {
+                TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(90),new ThreadPoolExecutor.AbortPolicy());
+        for (int i = 0; i < 12; i++) {
             Task task = new Task(i);
             pool.execute(task);
             System.out.println("线程池中线程数目：" + pool.getPoolSize() + "，队列中等待执行的任务数目：" +
@@ -38,10 +38,4 @@ public class Test {
     }
 
 
-}
-
-class TimerTaskThread extends Thread {
-    public TimerTaskThread() {
-        super.setName("TimerTaskThread");
-    }
 }
