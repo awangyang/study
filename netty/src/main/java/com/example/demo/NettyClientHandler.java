@@ -27,6 +27,9 @@ public class NettyClientHandler extends ChannelHandlerAdapter {
 //        ByteBuf buf = (ByteBuf) msg;
 //        String rev = getMessage(buf);
 //        System.err.println("客户端收到服务器消息:" + rev);
+        ByteBuf in = (ByteBuf) msg;
+        System.out.println(in.toString(CharsetUtil.UTF_8));
+        ctx.write(in);
     }
 
 //    private String getMessage(ByteBuf buf) {

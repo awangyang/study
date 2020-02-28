@@ -34,17 +34,17 @@ public class NettyClient {
         try {
 
             Bootstrap bootstrap = new Bootstrap();
-            bootstrap.channel(NioSocketChannel.class);
-            bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
-            bootstrap.group(eventLoopGroup);
-            bootstrap.remoteAddress(host, port);
-            bootstrap.handler(new ChannelInitializer<SocketChannel>() {
-                @Override
-                protected void initChannel(SocketChannel socketChannel)
-                        throws Exception {
-                    socketChannel.pipeline().addLast(new NettyClientHandler());
-                }
-            });
+            bootstrap.channel(NioSocketChannel.class)
+                    .option(ChannelOption.SO_KEEPALIVE, true)
+                    .group(eventLoopGroup)
+                    .remoteAddress(host, port)
+                    .handler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel socketChannel)
+                                throws Exception {
+                            socketChannel.pipeline().addLast(new NettyClientHandler());
+                        }
+                    });
             ChannelFuture channelFuture = bootstrap.connect(host, port).sync();
             if (channelFuture.isSuccess()) {
                 System.err.println("连接服务器成功");
