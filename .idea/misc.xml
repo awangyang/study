@@ -5,6 +5,9 @@
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/spring/pom.xml" />
+        <option value="$PROJECT_DIR$/spring-demo/pom.xml" />
+        <option value="$PROJECT_DIR$/spring-demo/design-pattern/pom.xml" />
+        <option value="$PROJECT_DIR$/spring-demo/spring-study/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
