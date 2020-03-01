@@ -3,6 +3,7 @@ package com.example.redis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -11,7 +12,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RedisTest {
 
-    @Autowired
+    @Resource
     private static RedisTemplate<String, String> redisTemplate;
 
 

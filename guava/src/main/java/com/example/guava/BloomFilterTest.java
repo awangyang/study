@@ -18,7 +18,7 @@ public class BloomFilterTest {
         System.out.println(userBloomFilter.mightContain(100L));
         System.out.println(userBloomFilter.mightContain(101L));
 
-        System.out.println(Long.bitCount(1L));
+        System.out.println(Long.bitCount(4L));
 
     }
 }
