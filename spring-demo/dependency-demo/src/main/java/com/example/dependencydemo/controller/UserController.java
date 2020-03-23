@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Wang Yang
- * @date 2020/3/121:59
+ * @date 2020/3/1 21:59
  */
 @RestController
 @RequestMapping("/index")
