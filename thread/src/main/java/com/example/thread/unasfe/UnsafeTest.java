@@ -57,5 +57,26 @@ public class UnsafeTest {
         System.out.println("after set ,first element is :" + unsafe.getObject(strings, (long) 20));
         System.out.println("after set ,first element is :" + unsafe.getObject(strings, (long) 24));
         System.out.println("after set ,first element is :" + unsafe.getObject(strings, (long) 28));
+
+        String s = "sssss";
+
+        String ss = "sssss".intern();
+
+        System.out.println(ss==s);
+
+        User user = new User();
+
+        user.name="sssss";
+        String sss=new String("sssss");
+
+        System.out.println(user.name==s);
+        System.out.println(user.name.intern()==s);
+        System.out.println(sss==s);
+        System.out.println(sss.intern()==s);
+
+    }
+
+    public static class User{
+        public String name;
     }
 }
