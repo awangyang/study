@@ -1,4 +1,4 @@
-package com.example;
+package com.example.test;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
