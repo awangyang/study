@@ -17,8 +17,8 @@ public class CarFactoryBean implements FactoryBean<Car> {
         Car car = new Car();
         String[] infos = carInfo.split(",");
         car.setBrand(infos[0]);
-        car.setMacSpeed(Integer.valueOf(infos[1]));
-        car.setPrice(Double.valueOf(infos[2]));
+        car.setMacSpeed(Integer.parseInt(infos[1]));
+        car.setPrice(Double.parseDouble(infos[2]));
         return car;
     }
 
