@@ -1,4 +1,4 @@
-package com.example.springstudy.factorybean;
+package com.example.spring.study.factorybean;
 
 import lombok.Data;
 import org.springframework.beans.factory.FactoryBean;

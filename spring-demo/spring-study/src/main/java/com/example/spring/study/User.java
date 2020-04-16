@@ -1,4 +1,4 @@
-package com.example.springstudy;
+package com.example.spring.study;
 
 import lombok.Data;
 

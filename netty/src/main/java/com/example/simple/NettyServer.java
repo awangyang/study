@@ -2,6 +2,7 @@ package com.example.simple;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -50,7 +51,12 @@ public class NettyServer {
             //绑定端口并且同步生成一个ChannelFuture对象
             //启动服务器
             ChannelFuture channelFuture = bootstrap.bind(6668).sync();
+            channelFuture.addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture channelFuture) throws Exception {
 
+                }
+            });
             //对关闭进行监听
             channelFuture.channel().closeFuture().sync();
         } finally {

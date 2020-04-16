@@ -1,9 +1,9 @@
-package com.example.springstudy;
+package com.example.spring.study;
 
 
 
-import com.example.springstudy.factorybean.Car;
-import com.example.springstudy.factorybean.CarFactoryBean;
+import com.example.spring.study.factorybean.Car;
+import com.example.spring.study.factorybean.CarFactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
