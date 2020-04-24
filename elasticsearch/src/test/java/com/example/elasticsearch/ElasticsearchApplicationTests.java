@@ -1,27 +1,43 @@
 package com.example.elasticsearch;
 
+import com.alibaba.fastjson.JSON;
 import com.example.elasticsearch.bean.Poems;
 import com.example.elasticsearch.service.PoemsRepository;
 import com.google.gson.Gson;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.get.*;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.client.indices.CreateIndexResponse;
+import org.elasticsearch.common.text.Text;
+import org.elasticsearch.index.query.MatchAllQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.data.elasticsearch.core.query.SearchQuery;
-import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
-import java.util.Optional;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Map;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -31,9 +47,29 @@ public class ElasticsearchApplicationTests {
     public void contextLoads() {
     }
 
-
     @Autowired
     private PoemsRepository poemsRepository;
+
+    @Autowired
+    @Qualifier("elasticsearchRestHighLevelClient")
+    private RestHighLevelClient restHighLevelClient;
+
+
+    @Test
+    public void addIndex() throws IOException {
+        CreateIndexRequest request = new CreateIndexRequest("poems");
+        CreateIndexResponse response = restHighLevelClient.indices().create(request, RequestOptions.DEFAULT);
+        System.out.println(JSON.toJSONString(response));
+
+    }
+
+    @Test
+    public void deleteIndex() throws IOException {
+        DeleteIndexRequest request = new DeleteIndexRequest("poems");
+        AcknowledgedResponse delete = restHighLevelClient.indices().delete(request, RequestOptions.DEFAULT);
+        System.out.println(delete.toString());
+    }
+
 
     @Test
     public void test() {
@@ -104,41 +140,76 @@ public class ElasticsearchApplicationTests {
 //        System.out.println("--------2------");
     }
 
-    @Autowired
-    private ElasticsearchTemplate elasticsearchTemplate;
+    @Test
+    public void queryPoems() throws IOException {
+//        Iterable<Poems> search = poemsRepository.findAll();
+//        search.forEach(System.out::println);
+        GetRequest request = new GetRequest("poems", "1");
+        GetResponse documentFields = restHighLevelClient.get(request, RequestOptions.DEFAULT);
+
+        System.out.println(documentFields.getSourceAsString());
+        System.out.println(documentFields);
+    }
 
     @Test
-    public void queryPoems() {
-        Optional<Poems> byId = poemsRepository.findById("1");
-        byId.ifPresent(System.out::println);
-//        elasticsearchTemplate.createIndex(Poems.class);
+    public void tt() throws IOException {
+        MultiGetRequest multiGetRequest = new MultiGetRequest();
 
-//        Iterable<Poems> all = poemsRepository.findAll(new Sort(Sort.Direction.ASC, "id"));
-
-//        QPageRequest queryBuilder = new QPageRequest(1,1000);
-//        Iterable<Poems> all = poemsRepository.findAll(queryBuilder);
-
-        System.out.println(poemsRepository.count());
-//        all.forEach(System.out::println);
-
-        //构建查询
-//        SearchQuery query = new NativeSearchQueryBuilder()
-//                .withQuery(bqb)
-//                .withSort(fsb)
-//                .addAggregation(builder)
-//                .withPageable(pageable)
-//                .build();
-
-//        Pageable pageable = PageRequest.of(1, 100, Sort.Direction.ASC, "id");
-//        Pageable pageable = PageRequest.of(0, 100);
-//        Page<Poems> all = poemsRepository.findAll(pageable);
-//        all.forEach(System.out::println);
-
-
-//        QueryBuilder qb1 = QueryBuilders.rangeQuery("id").lt(1);
-//        Iterable<Poems> search = poemsRepository.search(qb1);
-        Iterable<Poems> search = poemsRepository.findAll();
-        search.forEach(System.out::println);
-
+        multiGetRequest.add(new MultiGetRequest.Item("poems", "1"));
+//        multiGetRequest.add(new MultiGetRequest.Item("poems","2").fetchSourceContext(FetchSourceContext.DO_NOT_FETCH_SOURCE));
+        multiGetRequest.add(new MultiGetRequest.Item("poems", "2"));
+        MultiGetResponse mget = restHighLevelClient.mget(multiGetRequest, RequestOptions.DEFAULT);
+        System.out.println(mget.getResponses()[0].isFailed());
+        System.out.println(JSON.toJSONString(mget.getResponses()));
+        for (MultiGetItemResponse respons : mget.getResponses()) {
+//            System.out.println(JSON.toJSONString(respons));
+            System.out.println(JSON.toJSONString(respons.getResponse().getSource()));
+        }
     }
+
+    @Test
+    public void search() throws IOException {
+        SearchRequest searchRequest = new SearchRequest("poems");
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+
+        HighlightBuilder highlighter = new HighlightBuilder();
+//        HighlightBuilder.Field highlightContent = new HighlightBuilder.Field("content");
+
+//        highlightTitle.highlighterType("unified");
+
+        highlighter.preTags("<em>");
+        highlighter.postTags("</em>");
+        highlighter.requireFieldMatch(false);
+        highlighter.field("content");
+
+        searchSourceBuilder.highlighter(highlighter).query(QueryBuilders.termQuery("content", "登"));
+
+        searchRequest.source(searchSourceBuilder);
+        SearchResponse search = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        System.out.println(JSON.toJSONString(search));
+        SearchHits hits = search.getHits();
+        System.out.println(JSON.toJSONString(hits));
+        SearchHit[] hits1 = hits.getHits();
+        for (SearchHit documentFields : hits1) {
+            Map<String, HighlightField> highlightFields = documentFields.getHighlightFields();
+            HighlightField titleField = highlightFields.get("content");
+            Text[] fragments = titleField.fragments();
+            StringBuilder content = new StringBuilder();
+            for (Text fragment : fragments) {
+                content.append(fragment);
+            }
+            documentFields.getSourceAsMap().put("content", content.toString());
+            System.out.println(documentFields.getSourceAsMap());
+            System.out.println("---------------------");
+        }
+    }
+
+
+    @Test
+    public void jd() throws Exception {
+        Document parse = Jsoup.parse(new URL("https://search.jd.com/Search?keyword=衣服&enc=utf-8"), 3000);
+        System.out.println(parse.getElementById("J_goodsList").toString());
+    }
+
+
 }

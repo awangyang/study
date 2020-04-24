@@ -1,21 +1,19 @@
-package com.example.spring.study.annotation;
+package com.example.springstudy.annotation;
 
-import com.example.spring.study.User;
-import com.example.spring.study.annotation.config.TestConfig;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
- * @author Wang Yang
- * @date 2020/4/16 19:24
+ * @author wangyang
+ * @date 2020/04/14
  */
 public class Test {
-
     public static void main(String[] args) {
-        ApplicationContext context = new AnnotationConfigApplicationContext(TestConfig.class);
+        ApplicationContext context = new AnnotationConfigApplicationContext(PersonConfig.class);
 
-        User bean = context.getBean(User.class);
-        System.out.println(bean);
-
+        Person person = (Person) context.getBean("person");
+//        person.setAddress("beijing");
+//        person.setName("Tony");
+        System.out.println(person);
     }
 }

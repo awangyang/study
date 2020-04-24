@@ -12,7 +12,6 @@ public class CommandRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        System.out.println(args[0]);
         System.out.println("--------");
     }
 }
