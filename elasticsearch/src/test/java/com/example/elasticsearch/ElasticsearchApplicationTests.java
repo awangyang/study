@@ -2,10 +2,15 @@ package com.example.elasticsearch;
 
 import com.alibaba.fastjson.JSON;
 import com.example.elasticsearch.bean.Poems;
+import com.example.elasticsearch.bean.User;
 import com.example.elasticsearch.service.PoemsRepository;
 import com.google.gson.Gson;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.get.*;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
@@ -14,13 +19,11 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.common.text.Text;
-import org.elasticsearch.index.query.MatchAllQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.jsoup.Jsoup;
@@ -34,9 +37,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 
 @RunWith(SpringRunner.class)
@@ -84,12 +87,12 @@ public class ElasticsearchApplicationTests {
 
 
     @Test
-    public void addPoems() {
+    public void addPoems() throws IOException {
 
         File file = new File("C:\\Users\\WangYang\\Desktop\\3390.txt");
         StringBuilder sb = new StringBuilder();
         try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), "gbk"));
+            BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
             String line = "";
             while ((line = in.readLine()) != null) {
                 if (!line.equals("")) {
@@ -104,6 +107,8 @@ public class ElasticsearchApplicationTests {
         String str = sb.toString();
         String[] split = str.split("\\d+");
         int count = 1;
+        BulkRequest bulkRequest = new BulkRequest();
+        Map<String, Object> map = new HashMap<>();
         for (String s : split) {
             Poems poems = new Poems();
             String[] split1 = s.split("\r\n");
@@ -112,8 +117,11 @@ public class ElasticsearchApplicationTests {
                 if (i == 0) {
                     String[] split2 = split1[0].split("：");
                     if (split2.length == 2) {
-                        poems.setId(count++ + "");
+//                        poems.setId(count++);
+                        map.put("id", count++);
                         poems.setAuthor(split2[0]);
+                        map.put("author", split2[0]);
+                        map.put("title", split2[1]);
                         poems.setTitle(split2[1]);
                     }
                 } else {
@@ -122,12 +130,15 @@ public class ElasticsearchApplicationTests {
             }
 
             poems.setContent(stringBuilder.toString());
+            map.put("content", stringBuilder.toString());
             if (!StringUtils.isEmpty(poems.getAuthor())) {
-                poemsRepository.save(poems);
-                System.out.println(gson.toJson(poems));
+//                poemsRepository.save(poems);
+                bulkRequest.add(new IndexRequest("poems").id(String.valueOf(map.get("id"))).source(map));
             }
-        }
 
+        }
+        BulkResponse bulk = restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+        System.out.println(JSON.toJSONString(bulk));
 
 //        poems.setAuthor("李白");
 //        poems.setTitle("静夜思");
@@ -144,7 +155,7 @@ public class ElasticsearchApplicationTests {
     public void queryPoems() throws IOException {
 //        Iterable<Poems> search = poemsRepository.findAll();
 //        search.forEach(System.out::println);
-        GetRequest request = new GetRequest("poems", "1");
+        GetRequest request = new GetRequest("poems").id("b-Ipr3EB7FmcT5v0tJnC");
         GetResponse documentFields = restHighLevelClient.get(request, RequestOptions.DEFAULT);
 
         System.out.println(documentFields.getSourceAsString());
@@ -211,5 +222,24 @@ public class ElasticsearchApplicationTests {
         System.out.println(parse.getElementById("J_goodsList").toString());
     }
 
+
+    @Test
+    public void addUser() throws IOException {
+
+        User user;
+        user = new User();
+        user.setId(8);
+        user.setName("小蓝");
+        user.setAge(18);
+        user.setFave("学习听音乐");
+        user.setGrade("二年级");
+        user.setScore(89);
+        user.setSex("女");
+        IndexRequest request = new IndexRequest("user");
+        request.source(JSON.toJSONString(user), XContentType.JSON);
+        IndexResponse response = restHighLevelClient.index(request, RequestOptions.DEFAULT);
+
+        System.out.println(JSON.toJSONString(response));
+    }
 
 }

@@ -17,7 +17,7 @@ import java.io.Serializable;
 public class Poems implements Serializable {
 
     @Id
-    private String id;
+    private Integer id;
     @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_max_word")
     private String title;
     @Field(type = FieldType.Keyword)
