@@ -32,9 +32,12 @@ public class UnsafeTest {
     }
 
     public static void main(String[] args) {
+        System.out.println(stateOffset);
         UnsafeTest unsafeTest = new UnsafeTest();
         boolean b = unsafe.compareAndSwapLong(unsafeTest, stateOffset, 0, 2);
         System.out.println(b);
+        boolean b1 = unsafe.compareAndSwapLong(unsafeTest, stateOffset, 0, 2);
+        System.out.println(b1);
         System.out.println(unsafeTest.state);
 
 

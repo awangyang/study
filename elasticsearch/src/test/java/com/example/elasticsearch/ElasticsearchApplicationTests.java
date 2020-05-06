@@ -54,13 +54,13 @@ public class ElasticsearchApplicationTests {
     private PoemsRepository poemsRepository;
 
     @Autowired
-    @Qualifier("elasticsearchRestHighLevelClient")
+//    @Qualifier("elasticsearchRestHighLevelClient")
     private RestHighLevelClient restHighLevelClient;
 
 
     @Test
     public void addIndex() throws IOException {
-        CreateIndexRequest request = new CreateIndexRequest("poems");
+        CreateIndexRequest request = new CreateIndexRequest("user");
         CreateIndexResponse response = restHighLevelClient.indices().create(request, RequestOptions.DEFAULT);
         System.out.println(JSON.toJSONString(response));
 
@@ -155,7 +155,7 @@ public class ElasticsearchApplicationTests {
     public void queryPoems() throws IOException {
 //        Iterable<Poems> search = poemsRepository.findAll();
 //        search.forEach(System.out::println);
-        GetRequest request = new GetRequest("poems").id("b-Ipr3EB7FmcT5v0tJnC");
+        GetRequest request = new GetRequest("poems").id("1");
         GetResponse documentFields = restHighLevelClient.get(request, RequestOptions.DEFAULT);
 
         System.out.println(documentFields.getSourceAsString());
