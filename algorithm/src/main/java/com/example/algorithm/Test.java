@@ -10,9 +10,9 @@ import java.util.Random;
 public class Test {
 
     public static void main(String[] args) {
-        int[] arr = new int[100000];
+        int[] arr = new int[1000000];
         for (int i = 0; i < arr.length; i++) {
-            arr[i] = new Random().nextInt(50000000);
+            arr[i] = new Random().nextInt(500000000);
         }
 //        int[] bubble = Arrays.copyOf(arr,arr.length);
 //        AbstractSortTest sortTest1 = new BubbleSort();
@@ -26,9 +26,13 @@ public class Test {
 //        AbstractSortTest sortTest3 = new InsertionSort();
 //        sortTest3.test(insertion);
 
-        int[] shell = Arrays.copyOf(arr,arr.length);
-        AbstractSortTest sortTest4 = new ShellSort();
-        sortTest4.test(shell);
+//        int[] shell = Arrays.copyOf(arr,arr.length);
+//        AbstractSortTest sortTest4 = new ShellSort();
+//        sortTest4.test(shell);
+
+        int[] quick = Arrays.copyOf(arr,arr.length);
+        AbstractSortTest sortTest5 = new QuickSort();
+        sortTest5.test(quick);
 
 //        System.out.println(Arrays.toString(arr));
 //        System.out.println(Arrays.toString(bubble));
